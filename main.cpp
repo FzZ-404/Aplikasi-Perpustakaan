@@ -1,75 +1,143 @@
 #include <iostream>
+#include <iomanip>
 #include <string>
+#include <windows.h>
 using namespace std;
 
+
+void setColor(int color) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+}
 
 struct Buku {
     string kode;
     string judul;
-    bool dipinjam; 
+    bool dipinjam;
 };
 
 
+void header();
+void tampilkanMenu();
 void tampilkanSemuaBuku(Buku arr[], int n);
 int cariBukuByKode(Buku arr[], int n, string kode);
 void prosesPinjamBuku(Buku arr[], int n, string kode);
 void prosesKembalikanBuku(Buku arr[], int n, string kode);
 void urutkanBuku(Buku arr[], int n);
-void tampilkanMenu();
+void pause();
 
 
-void tampilkanSemuaBuku(Buku arr[], int n) {
-    cout << "\n=== DATA BUKU ===\n";
-    for (int i = 0; i < n; i++) {
-        cout << i+1 << ". " << arr[i].kode << " - " << arr[i].judul;
-        cout << " [" << (arr[i].dipinjam ? "Dipinjam" : "Tersedia") << "]\n";
-    }
+void header() {
+    system("cls");
+    setColor(11);
+    cout << "=====================================================\n";
+    cout << "               SISTEM PERPUSTAKAAN C++              \n";
+    cout << "=====================================================\n";
+    setColor(7);
 }
 
 
+void tampilkanMenu() {
+    cout << "\n";
+    setColor(14);
+    cout << "+-------------------------- MENU --------------------------+\n";
+    setColor(7);
+    cout << "  1. Tampilkan Semua Buku\n";
+    cout << "  2. Pinjam Buku\n";
+    cout << "  3. Kembalikan Buku\n";
+    cout << "  4. Cari Buku Berdasarkan Kode\n";
+    cout << "  5. Keluar\n";
+    setColor(14);
+    cout << "+-----------------------------------------------------------+\n";
+    setColor(11);
+    cout << "  Pilih menu: ";
+    setColor(7);
+}
+
+void tampilkanSemuaBuku(Buku arr[], int n) {
+    header();
+    setColor(10);
+    cout << "DAFTAR BUKU TERSEDIA\n";
+    setColor(7);
+    cout << "-------------------------------------------------------------\n";
+    cout << left << setw(10) << "Kode" 
+         << setw(30) << "Judul" 
+         << "Status\n";
+    cout << "-------------------------------------------------------------\n";
+
+    for (int i = 0; i < n; i++) {
+        cout << left << setw(10) << arr[i].kode
+             << setw(30) << arr[i].judul;
+
+        if (arr[i].dipinjam) {
+            setColor(12);
+            cout << "Dipinjam";
+        } else {
+            setColor(10);
+            cout << "Tersedia";
+        }
+        setColor(7);
+        cout << "\n";
+    }
+
+    cout << "-------------------------------------------------------------\n";
+    pause();
+}
+
 int cariBukuByKode(Buku arr[], int n, string kode) {
     for (int i = 0; i < n; i++) {
-        if (arr[i].kode == kode) {
-            return i;
-        }
+        if (arr[i].kode == kode) return i;
     }
     return -1;
 }
 
 
 void prosesPinjamBuku(Buku arr[], int n, string kode) {
+    header();
     int idx = cariBukuByKode(arr, n, kode);
 
     if (idx == -1) {
-        cout << "❌ Buku dengan kode " << kode << " tidak ditemukan.\n";
+        setColor(12);
+        cout << "❌ Buku tidak ditemukan!\n";
+        setColor(7);
+        pause();
         return;
     }
 
     if (arr[idx].dipinjam) {
-        cout << "⚠️ Buku '" << arr[idx].judul << "' sedang dipinjam.\n";
+        setColor(14);
+        cout << "⚠ Buku tersebut sedang dipinjam.\n";
     } else {
         arr[idx].dipinjam = true;
-        cout << "✔️ Buku '" << arr[idx].judul << "' berhasil dipinjam.\n";
+        setColor(10);
+        cout << "✔ Buku '" << arr[idx].judul << "' berhasil dipinjam!\n";
     }
+    setColor(7);
+    pause();
 }
 
 
 void prosesKembalikanBuku(Buku arr[], int n, string kode) {
+    header();
     int idx = cariBukuByKode(arr, n, kode);
 
     if (idx == -1) {
-        cout << "❌ Buku tidak ditemukan.\n";
+        setColor(12);
+        cout << "❌ Buku tidak ditemukan!\n";
+        setColor(7);
+        pause();
         return;
     }
 
     if (!arr[idx].dipinjam) {
-        cout << "⚠️ Buku '" << arr[idx].judul 
-             << "' tidak sedang dipinjam.\n";
+        setColor(14);
+        cout << "⚠ Buku tidak sedang dipinjam.\n";
     } else {
         arr[idx].dipinjam = false;
-        cout << "✔️ Buku '" << arr[idx].judul 
-             << "' berhasil dikembalikan.\n";
+        setColor(10);
+        cout << "✔ Buku berhasil dikembalikan!\n";
     }
+    setColor(7);
+    pause();
 }
 
 
@@ -85,78 +153,79 @@ void urutkanBuku(Buku arr[], int n) {
     }
 }
 
-
-void tampilkanMenu() {
-    cout << "\n==== MENU PERPUSTAKAAN ====\n";
-    cout << "1. Tampilkan Semua Buku\n";
-    cout << "2. Pinjam Buku\n";
-    cout << "3. Kembalikan Buku\n";
-    cout << "4. Cari Buku Berdasarkan Kode\n";
-    cout << "5. Keluar\n";
-    cout << "Pilih menu: ";
+void pause() {
+    setColor(11);
+    cout << "\nTekan enter untuk melanjutkan...";
+    setColor(7);
+    cin.ignore();
+    cin.get();
 }
 
 
 int main() {
-    const int n = 3;
-    Buku arr[n] = {
+    Buku buku[5] = {
         {"B001", "Dasar Algoritma", false},
         {"B002", "Struktur Data", false},
-        {"B003", "Matematika Diskrit", false}
+        {"B003", "Matematika Diskrit", false},
+        {"B004", "Pemrograman C++", true},
+        {"B005", "Jaringan Komputer", false},
     };
 
+    int n = 5;
     int pilihan;
     string kode;
 
-    // urutkan terlebih dahulu
-    urutkanBuku(arr, n);
+    urutkanBuku(buku, n);
 
     do {
+        header();
         tampilkanMenu();
         cin >> pilihan;
 
-        switch(pilihan) {
+        switch (pilihan) {
             case 1:
-                urutkanBuku(arr, n);
-                tampilkanSemuaBuku(arr, n);
+                tampilkanSemuaBuku(buku, n);
                 break;
-
             case 2:
-                cout << "Masukkan kode buku: ";
+                cout << "\nMasukkan kode buku: ";
                 cin >> kode;
-                prosesPinjamBuku(arr, n, kode);
+                prosesPinjamBuku(buku, n, kode);
                 break;
-
             case 3:
-                cout << "Masukkan kode buku: ";
+                cout << "\nMasukkan kode buku: ";
                 cin >> kode;
-                prosesKembalikanBuku(arr, n, kode);
+                prosesKembalikanBuku(buku, n, kode);
                 break;
-
             case 4:
+                header();
                 cout << "Masukkan kode buku: ";
                 cin >> kode;
                 {
-                    int idx = cariBukuByKode(arr, n, kode);
-                    if (idx == -1)
-                        cout << "❌ Buku tidak ditemukan.\n";
-                    else {
-                        cout << "✔️ Ditemukan: " 
-                             << arr[idx].kode 
-                             << " - " << arr[idx].judul << "\n";
+                    int idx = cariBukuByKode(buku, n, kode);
+                    if (idx == -1) {
+                        setColor(12); cout << "❌ Buku tidak ditemukan!\n";
+                    } else {
+                        setColor(10);
+                        cout << "\n✔ Ditemukan: " << buku[idx].kode 
+                             << " - " << buku[idx].judul << "\n";
                     }
+                    setColor(7);
+                    pause();
                 }
                 break;
-
             case 5:
-                cout << "Keluar...\n";
+                setColor(10);
+                cout << "\nTerima kasih telah menggunakan aplikasi ini!\n";
+                setColor(7);
                 break;
-
             default:
-                cout << "⛔ Pilihan tidak valid!\n";
+                setColor(12);
+                cout << "❌ Pilihan tidak valid!\n";
+                setColor(7);
+                pause();
         }
 
-    } while(pilihan != 5);
+    } while (pilihan != 5);
 
     return 0;
 }
